@@ -34,7 +34,7 @@
         
             function preload ()
             {
-                this.load.image('map', 'assets/earthbound-scarab.png');
+                this.load.image('sky', 'assets/sky.png');
                 this.load.image('ground', 'assets/platform.png');
                 this.load.image('star', 'assets/star.png');
                 this.load.image('bomb', 'assets/bomb.png');
@@ -46,12 +46,7 @@
         
             function create ()
             {
-                this.cameras.main.setBounds(0, 0, 1024, 2048);
-
-                this.add.image(0, 0, 'map').setOrigin(0);
-
-                this.cameras.main.setZoom(4);
-                this.cameras.main.centerOn(0, 0);
+                this.add.image(400, 300, 'sky');
 
                 platforms = this.physics.add.staticGroup();
                 
@@ -139,7 +134,7 @@
 
                 if (cursors.up.isDown && player.body.touching.down)
                 {
-                    player.setVelocityY(-1000);
+                    player.setVelocityY(-200);
                 }
             }
 
