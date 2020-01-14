@@ -14,7 +14,7 @@ var BootScene = new Phaser.Class({
     preload: function ()
     {
         // imports background
-        this.load.image('sky', 'assets/sky.png');
+        this.load.image('sky', 'assets/sky2.png');
         
         // enemy spritesheets
         this.load.spritesheet("merc", "assets/MercSS.png", { frameWidth: 32, frameHeight: 32 });
