@@ -10,7 +10,7 @@ var BattleScene = new Phaser.Class({
     },
     create: function ()
     {    
-        // change the background to green
+        // changes the background to black
         this.cameras.main.setBackgroundColor("rgba(0, 0, 0, 0.5)");
         this.startBattle();
         // on wake event we call startBattle too
@@ -28,7 +28,7 @@ var BattleScene = new Phaser.Class({
         var merc = new Enemy(this, 50, 50, "merc", 8, "Mercenary", 50, 3);
         this.add.existing(merc);
         
-        var archer = new Enemy(this, 50, 100, "archer", 8,"Archer", 50, 3);
+        var archer = new Enemy(this, 50, 100, "archer", 8, "Archer", 50, 3);
         this.add.existing(archer);
         
         // array with heroes
@@ -87,14 +87,47 @@ var BattleScene = new Phaser.Class({
             repeat: -1
         });
         this.anims.create({
-                key: 'fireAttack',
-                frames: this.anims.generateFrameNumbers('player', { start: 20, end: 23 }),
-                frameRate: 5,
-                yoyo: true,
-                repeat: -1
-            });
+            key: 'fireAttack',
+            frames: this.anims.generateFrameNumbers('player', { start: 20, end: 23 }),
+            frameRate: 5,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'strikeAttack',
+            frames: this.anims.generateFrameNumbers('flavia', { start: 4, end: 7 }),
+            frameRate: 5,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'bowAttack',
+            frames: this.anims.generateFrameNumbers('archer', { start: 4, end: 7 }),
+            frameRate: 5,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'slashAttack',
+            frames: this.anims.generateFrameNumbers('merc', { start: 4, end: 7 }),
+            frameRate: 5,
+            repeat: -1
+        });
     },
     nextTurn: function() {  
+        mageAnims.anims.play('idle', true);
+        warriorAnims.anims.play('idleFlavia', true);
+        mercAnims.anims.play('idleMerc', true);
+        archerAnims.anims.play('idleArcher', true);
+        if(!this.units[0].living){
+            mageAnims.destroy();
+        }
+        else if (!this.units[1].living){
+            warriorAnims.destroy();
+        }
+        else if (!this.units[2].living){
+            mercAnims.destroy();
+        }
+        else if (!this.units[3].living){
+            archerAnims.destroy();
+        }
         // if we have victory or game over
         if(this.checkEndBattle()) {           
             this.endBattle();
@@ -143,26 +176,10 @@ var BattleScene = new Phaser.Class({
     // when the player have selected the enemy to be attacked
     receivePlayerSelection: function(action, target) {
         if(action == "attack") {
-            if(this.type == "Mage"){
-            fire = this.physics.add.sprite(250, 50, 'fire', 0);
-            fire.setVelocityX(-50);
-            fire.anims.play('flames');
-            this.time.delayedCall(1000, this.hideAttack);
-            }
             this.units[this.index].attack(this.enemies[target]);              
-            
         }
         // next turn in 3 seconds
         this.time.addEvent({ delay: 3000, callback: this.nextTurn, callbackScope: this });        
-    },
-    mageAttack: function() {
-        fire = this.physics.add.sprite(250, 50, 'fire', 0);
-        fire.setVelocityX(-50);
-        fire.anims.play('flames');
-        this.time.delayedCall(1000, this.hideAttack); 
-    },
-    hideAttack: function(){
-        fire.destroy();
     },
     endBattle: function() {       
         // clear state, remove sprites
@@ -204,6 +221,15 @@ var Unit = new Phaser.Class({
             target.takeDamage(this.damage);
             if (this.type == "Mage"){
                 mageAnims.anims.play('fireAttack', true);
+            }
+            else if (this.type == "Warrior"){
+                warriorAnims.anims.play('strikeAttack', true);
+            }
+            else if (this.type == "Archer"){
+                archerAnims.anims.play('bowAttack', true);
+            }
+            else if (this.type == "Mercenary"){
+                mercAnims.anims.play('slashAttack', true);
             }
             this.scene.events.emit("Message", this.type + " attacks " + target.type + " for " + this.damage + " damage");
         }
