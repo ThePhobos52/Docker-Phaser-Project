@@ -52,7 +52,7 @@ var WorldScene = new Phaser.Class({
     create: function ()
     {
         // Adds background
-        this.add.image(400, 300, 'sky');
+        this.add.image(0, 0, 'sky');
         
         // Player Animations
         this.anims.create({
