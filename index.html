@@ -6,8 +6,10 @@
     </head>
     <body>
         <script type="text/javascript">
+
             var config = {
                 type: Phaser.AUTO,
+                parent: 'content',
                 width: 800,
                 height: 600,
                 physics: {
@@ -18,67 +20,238 @@
                     }
                 },
                 scene: {
-                    preload: preload,
-                    create: create,
-                    update: update
+                    BootScene,
+                    WorldScene,
+                    BattleScene,
+                    UIScene
                 }
             };
         
-            var platforms;
-            var mouse;
-            var score = 0;
-            var scoreText;
+            var player;
+
             var game = new Phaser.Game(config);
-        
-            function preload ()
+
+            var BootScene = new Phaser.Class({
+ 
+            Extends: Phaser.Scene,
+ 
+            initialize:
+ 
+            function BootScene ()
             {
-                this.load.image('ch1', 'assets/ch1.png');
-                this.load.image('ground', 'assets/platform.png');
-                this.load.image('star', 'assets/star.png');
-                this.load.image('mouse', 'assets/Select.png');
-                this.load.image('assassin', 'assets/assassin')
+                Phaser.Scene.call(this, { key: 'BootScene' });
+            },
+ 
+            preload: function ()
+            {
+                this.load.image('sky', 'assets/sky.png');
+                this.load.spritesheet('dude', 'assets/PlayerSS.png',{ frameWidth: 32, frameHeight: 32 });
+                this.load.spritesheet('merc', 'assets/MercSS.png',{frameWidth: 32, frameHeight: 32});
+            },
+ 
+            create: function ()
+            {
+                this.scene.start('WorldScene');
             }
+});
         
-            function create ()
+            var WorldScene = new Phaser.Class({
+
+            Extends: Phaser.Scene,
+
+            initialize:
+
+            function WorldScene ()
             {
-                this.add.image(0, 0, 'ch1');
-                mouse = this.physics.add.image(-120, -168, 'mouse');
+                Phaser.Scene.call(this, { key: 'WorldScene' });
+            },
+
+            preload: function ()
+            {
+                
+            },
+        
+            create: function ()
+            {
+                // Adds background
+                this.add.image(400, 300, 'sky');
+                
+                // Camera Stuff
                 this.cameras.main.setZoom(4);
                 this.cameras.main.centerOn(0, 0);
+                this.cameras.main.setBounds(0, 0, 800, 600);
 
-                // Boundarys
-                this.cameras.main.setBounds(-120, -168, 240, 336);
-                this.physics.world.setBounds(-120, -168, 240, 336);
+                // Adds player
+                player = this.physics.add.sprite(100, 450, 'dude');
 
-                // Brings in keyboard inputs
+                // Adds merc
+                merc = this.physics.add.sprite(50, 450,'merc');
+
+                // Adds collision
+                player.setCollideWorldBounds(true);
+
+                // Player Animations
+                this.anims.create({
+                    key: 'left',
+                    frames: this.anims.generateFrameNumbers('dude', { start: 4, end: 7 }),
+                    frameRate: 10,
+                    yoyo: true,
+                    repeat: -1
+                });
+
+                this.anims.create({
+                    key: 'idle',
+                    frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
+                    frameRate: 5,
+                    yoyo: true,
+                    repeat: -1
+                });
+
+                this.anims.create({
+                    key: 'right',
+                    frames: this.anims.generateFrameNumbers('dude', { start: 8, end: 11 }),
+                    frameRate: 10,
+                    yoyo: true,
+                    repeat: -1
+                });
+
+                this.anims.create({
+                    key: 'down',
+                    frames: this.anims.generateFrameNumbers('dude', { start: 12, end: 15}),
+                    frameRate: 10,
+                    yoyo: true,
+                    repeat: -1
+                });
+
+                this.anims.create({
+                    key: 'up',
+                    frames: this.anims.generateFrameNumbers('dude', { start: 16, end: 19}),
+                    frameRate: 8,
+                    yoyo: true,
+                    repeat: -1
+                });
+
+                // Merc Animations
+                this.anims.create({
+                    key:'mercIdle',
+                    frames: this.anims.generateFrameNumbers('merc', { start: 0, end: 3}),
+                    frameRate: 5,
+                    yoyo: true,
+                    repeat: -1 
+                })
+
+                // Imports keyboard controls
                 cursors = this.input.keyboard.createCursorKeys();
 
-                mouse.setCollideWorldBounds(true);
-                this.cameras.main.startFollow(mouse, true, 1.05, 1.05);
-            }
-        
-            function update ()
-            {
+                // Camera follow player hehehehehhe
+                this.cameras.main.startFollow(player, true, 1.05, 1.05);
 
+                this.physics.add.overlap(player, merc, OnMeetEnemy, false);
+
+            },
+        
+            update: function(time, delta)
+            {
+                player.setVelocity(0);
+
+                // Controls  
                 if (cursors.left.isDown)
                 {
-                    mouse.x += -16;   
+                    player.setVelocityX(-160);
+
+                    player.anims.play('left', true);
                 }
                 else if (cursors.right.isDown)
                 {
-                    mouse.x += 16;
-                }
+                    player.setVelocityX(160);
 
-                if (cursors.up.isDown)
-                {
-                    mouse.y += -16;
+                    player.anims.play('right', true);
                 }
-                else if (cursors.down.isDown)
+                
+                if (cursors.down.isDown)
                 {
-                    mouse.y += 16;  
+                    player.setVelocityY(160);
                 }
-            }
+                else if (cursors.up.isDown)
+                {
+                    player.setVelocityY(-160);
+                }
+                
+                // For Animations
+                if (cursors.down.isDown)
+                {
+                    player.anims.play('down', true);
+                }
+                else if (cursors.up.isDown)
+                {
+                    player.anims.play('up', true);
+                }
+                else if (cursors.left.isDown)
+                {
+                    player.anims.play('left', true);
+                }
+                else if (cursors.right.isDown)
+                {
+                    player.anims.play('right', true);
+                }
+                else
+                    player.anims.play('idle', true);
+
+                // Merc Animation (might break later)
+                merc.anims.play('mercIdle', true);
+            },
         
+            OnMeetEnemy: function ()
+            {
+                // switch to BattleScene
+                this.scene.start('BattleScene');
+
+            }
+        });
+
+var BattleScene = new Phaser.Class({
+ 
+Extends: Phaser.Scene,
+
+initialize:
+
+function BattleScene ()
+{
+     Phaser.Scene.call(this, { key: 'BattleScene' });
+ },
+ create: function ()
+ {
+     // set the background of the main scene green
+     this.cameras.main.setBackgroundColor('rgba(0, 200, 0, 0.5)');
+     // Run UI Scene at the same time
+     this.scene.run('UIScene');
+ }
+});
+
+var UIScene = new Phaser.Class({
+
+ Extends: Phaser.Scene,
+
+ initialize:
+
+ function UIScene ()
+ {
+     Phaser.Scene.call(this, { key: 'UIScene' });
+ },
+
+ create: function ()
+ {       
+     this.graphics = this.add.graphics();
+     this.graphics.lineStyle(1, 0xffffff);
+     this.graphics.fillStyle(0x031f4c, 1);        
+     this.graphics.strokeRect(2, 150, 90, 100);
+     this.graphics.fillRect(2, 150, 90, 100);
+     this.graphics.strokeRect(95, 150, 90, 100);
+     this.graphics.fillRect(95, 150, 90, 100);
+     this.graphics.strokeRect(188, 150, 130, 100);
+     this.graphics.fillRect(188, 150, 130, 100);
+ }
+});
         </script>
     </body>
-</html>
+</html> 
