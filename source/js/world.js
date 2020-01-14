@@ -52,7 +52,7 @@ var WorldScene = new Phaser.Class({
     create: function ()
     {
         // Adds background
-        this.add.image(0, 0, 'sky');
+        this.add.image(400, 300, 'sky');
         
         // Player Animations
         this.anims.create({
@@ -99,6 +99,14 @@ var WorldScene = new Phaser.Class({
             yoyo: true,
             repeat: -1
         });
+        // Archer Animations
+        this.anims.create({
+            key: 'idleArcher',
+            frames: this.anims.generateFrameNumbers('archer', { start: 0, end: 3 }),
+            frameRate: 5,
+            yoyo: true,
+            repeat: -1
+        });
 
         // our player sprite created through the phycis system
         this.player = this.physics.add.sprite(50, 100, 'player', 6);
@@ -115,7 +123,7 @@ var WorldScene = new Phaser.Class({
         this.cursors = this.input.keyboard.createCursorKeys();
                 
         this.ghost = this.physics.add.sprite(100, 100, 'merc', 1);
-        this.ghost.anims.play('idleMerc', true);
+        this.ghost.anims.play('idleArcher', true);
         // add collider
         this.physics.add.overlap(this.player, this.ghost, this.onMeetEnemy, false, this);
         // we listen for 'wake' event
