@@ -19,7 +19,7 @@ var BootScene = new Phaser.Class({
         // enemy spritesheets
         this.load.spritesheet("merc", "assets/MercSS.png", { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet("archer", "assets/ArcherSS.png", { frameWidth: 32, frameHeight: 32 });
-        this.load.spritesheet("fire", "assets/fire.png", { frameWidth: 16, frameHeight: 16 });
+        this.load.spritesheet("fire", "assets/Fire.png", { frameWidth: 16, frameHeight: 16 });
         
         // character spritesheets
         this.load.spritesheet('player', 'assets/PlayerSS.png', { frameWidth: 32, frameHeight: 32 });
