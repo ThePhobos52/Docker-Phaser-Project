@@ -123,7 +123,7 @@ var WorldScene = new Phaser.Class({
         this.cursors = this.input.keyboard.createCursorKeys();
                 
         this.ghost = this.physics.add.sprite(100, 100, 'merc', 1);
-        this.ghost.anims.play('idleArcher', true);
+        this.ghost.anims.play('idleMerc', true);
         // add collider
         this.physics.add.overlap(this.player, this.ghost, this.onMeetEnemy, false, this);
         // we listen for 'wake' event
